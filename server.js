@@ -4,8 +4,6 @@ var express     = require('express'),
     app         = express(),
     customers   = JSON.parse(fs.readFileSync('data/customers.json', 'utf-8')),
     states      = JSON.parse(fs.readFileSync('data/states.json', 'utf-8')),
-    //inContainer = process.env.CONTAINER,
-    //inAzure = process.env.WEBSITE_RESOURCE_GROUP,
     port = process.env.PORT || 8080;
 
 app.use(express.urlencoded({ extended: true }));
@@ -21,10 +19,8 @@ app.use((req, res, next) => {
 });
 
 //The dist folder has our static resources (index.html, css, images)
-//if (!inContainer) {
-    app.use(express.static(__dirname + '/dist'));
-    console.log('path :' , __dirname);
-//}
+app.use(express.static(__dirname + '/dist/'));
+console.log('path :' , __dirname);
 
 app.get('/api/customers/page/:skip/:top', (req, res) => {
     const topVal = req.params.top,
@@ -127,24 +123,22 @@ app.post('/api/auth/logout', (req, res) => {
     res.json(true);
 });
 
-//if (!inContainer) {
-    // redirect all others to the index (HTML5 history)
-    app.all('/*', function(req, res) {
-        res.sendFile(__dirname + '/dist/index.html');
-    });
-//}
+
+// redirect all others to the index (HTML5 history)
+app.all('/*', function(req, res) {
+    res.sendFile(__dirname + '/dist/index.html');
+});
 
 app.listen(port);
 
 console.log('Express listening on port ' + port);
 
-// //Open browser
-//if (!inContainer && !inAzure) {
-    var opn = require('opn');
+//Open browser:
 
-    opn('http://localhost:' + port).then(() => {
-        console.log('Browser closed.');
-    });
-//}
+var opn = require('opn');
+
+opn('http://localhost:' + port).then(() => {
+    console.log('Browser closed.');
+});
 
 
